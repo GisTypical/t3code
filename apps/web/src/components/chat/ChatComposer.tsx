@@ -5984,6 +5984,7 @@ export const ChatComposer = memo(function ChatComposer(props: ChatComposerProps)
       }}
       className="mx-auto w-full min-w-0 max-w-3xl"
       data-chat-composer-form="true"
+      data-keybinding-picker-focus={composerMenuOpen || undefined}
     >
       {composerControlsInStrip && restingControlsHost
         ? createPortal(

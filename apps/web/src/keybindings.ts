@@ -12,6 +12,7 @@ import { isMacPlatform } from "./lib/utils";
 
 export interface ShortcutEventLike {
   getModifierState?: (key: "AltGraph") => boolean;
+  target?: EventTarget | null;
   type?: string;
   code?: string;
   key: string;
@@ -141,14 +142,23 @@ function resolvePlatform(options: ShortcutMatchOptions | undefined): string {
   return options?.platform ?? navigator.platform;
 }
 
-function resolveContext(options: ShortcutMatchOptions | undefined): ShortcutMatchContext {
+function hasClosest(target: EventTarget): target is EventTarget & {
+  closest: (selector: string) => unknown;
+} {
+  return "closest" in target && typeof target.closest === "function";
+}
+
+function resolveContext(
+  options: ShortcutMatchOptions | undefined,
+  pickerFocus = false,
+): ShortcutMatchContext {
   return {
     terminalFocus: false,
     terminalOpen: false,
     previewFocus: false,
     previewOpen: false,
-    pickerFocus: false,
     ...options?.context,
+    pickerFocus: pickerFocus || options?.context?.pickerFocus === true,
   };
 }
 
@@ -234,7 +244,13 @@ export function resolveShortcutCommand(
   options?: ShortcutMatchOptions,
 ): KeybindingCommand | null {
   const platform = resolvePlatform(options);
-  const context = resolveContext(options);
+  const target = event.target;
+  const pickerFocus =
+    target !== null &&
+    target !== undefined &&
+    hasClosest(target) &&
+    target.closest("[data-keybinding-picker-focus]") !== null;
+  const context = resolveContext(options, pickerFocus);
 
   for (let index = keybindings.length - 1; index >= 0; index -= 1) {
     const binding = keybindings[index];

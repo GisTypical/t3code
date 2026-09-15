@@ -98,7 +98,7 @@ export function CommandPaletteContent({
   };
 
   return (
-    <div className="contents" data-testid={testId}>
+    <div className="contents" data-keybinding-picker-focus="" data-testid={testId}>
       <Command {...commandProps}>
         <div className="relative">
           <CommandInput {...inputProps} ref={inputRef} onKeyDown={onInputKeyDown} />

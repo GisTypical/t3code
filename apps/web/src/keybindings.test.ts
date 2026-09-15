@@ -791,6 +791,39 @@ describe("resolveShortcutCommand", () => {
     );
   });
 
+  it("derives picker focus before focused picker handlers run", () => {
+    const keybindings = compile([
+      {
+        shortcut: ctrlShortcut("n"),
+        command: "picker.next",
+        whenAst: whenIdentifier("pickerFocus"),
+      },
+      {
+        shortcut: ctrlShortcut("n"),
+        command: "chat.new",
+        whenAst: whenNot(whenIdentifier("pickerFocus")),
+      },
+    ]);
+    const target = new (class extends EventTarget {
+      closest(selector: string) {
+        return selector === "[data-keybinding-picker-focus]" ? this : null;
+      }
+    })();
+
+    assert.strictEqual(
+      resolveShortcutCommand(event({ key: "n", ctrlKey: true, target }), keybindings, {
+        platform: "Linux",
+      }),
+      "picker.next",
+    );
+    assert.strictEqual(
+      resolveShortcutCommand(event({ key: "n", ctrlKey: true }), keybindings, {
+        platform: "Linux",
+      }),
+      "chat.new",
+    );
+  });
+
   it("returns dynamic script commands", () => {
     const keybindings = compile([{ shortcut: modShortcut("r"), command: "script.setup.run" }]);
 

@@ -191,6 +191,7 @@ export function PullRequestResolveConflictsButton({
 export function PullRequestPrimaryAction({
   pullRequestKey,
   primaryAction,
+  mergeBlockedReason,
   autoMergeArmed,
   armedAutoMergeLabel,
   pendingAutoMergeLabel,
@@ -203,6 +204,7 @@ export function PullRequestPrimaryAction({
 }: {
   pullRequestKey: string;
   primaryAction: ReturnType<typeof resolvePullRequestPrimaryControl> | null;
+  mergeBlockedReason: string | null;
   autoMergeArmed: boolean;
   armedAutoMergeLabel: string;
   pendingAutoMergeLabel: string;
@@ -262,7 +264,7 @@ export function PullRequestPrimaryAction({
                 <Button
                   size="xs"
                   variant="default"
-                  disabled={actionPending}
+                  disabled={actionPending || mergeBlockedReason !== null}
                   {...inlineConfirm.props(
                     "enable-auto-merge",
                     () => void perform("enable-auto-merge", selectedMergeMethod),
@@ -299,11 +301,12 @@ export function PullRequestPrimaryAction({
             }
           />
           <TooltipPopup side="top">
-            {pendingAction === "enable-auto-merge"
-              ? "Enabling..."
-              : inlineConfirm.isArmed("enable-auto-merge")
-                ? "Confirm auto-merge?"
-                : pendingAutoMergeLabel}
+            {mergeBlockedReason ??
+              (pendingAction === "enable-auto-merge"
+                ? "Enabling..."
+                : inlineConfirm.isArmed("enable-auto-merge")
+                  ? "Confirm auto-merge?"
+                  : pendingAutoMergeLabel)}
           </TooltipPopup>
         </Tooltip>
       ) : primaryAction === "auto-merge-armed" ? (
@@ -328,7 +331,7 @@ export function PullRequestPrimaryAction({
                 <Button
                   size="xs"
                   variant="default"
-                  disabled={actionPending}
+                  disabled={actionPending || mergeBlockedReason !== null}
                   {...inlineConfirm.props(
                     "merge",
                     () => void perform("merge", selectedMergeMethod),
@@ -365,11 +368,12 @@ export function PullRequestPrimaryAction({
             }
           />
           <TooltipPopup side="top">
-            {pendingAction === "merge"
-              ? "Merging..."
-              : inlineConfirm.isArmed("merge")
-                ? "Confirm merge?"
-                : selectedMergeMethodLabel}
+            {mergeBlockedReason ??
+              (pendingAction === "merge"
+                ? "Merging..."
+                : inlineConfirm.isArmed("merge")
+                  ? "Confirm merge?"
+                  : selectedMergeMethodLabel)}
           </TooltipPopup>
         </Tooltip>
       ) : (primaryAction === "merged" || primaryAction === "closed") &&

@@ -210,8 +210,10 @@ export function PullRequestStackMenu({
                 <Button
                   variant="default"
                   size="xs"
-                  disabled={mergeDisabled}
-                  onClick={() => setConfirmation("merge")}
+                  disabled={mergeDisabled && !stale}
+                  aria-disabled={mergeDisabled || undefined}
+                  aria-description={stale ? (notice ?? undefined) : undefined}
+                  onClick={mergeDisabled ? undefined : () => setConfirmation("merge")}
                 >
                   <PullRequestGlyph.merged aria-hidden className="size-3.5" />
                   Merge stack

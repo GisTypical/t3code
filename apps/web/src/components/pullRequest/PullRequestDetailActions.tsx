@@ -264,11 +264,15 @@ export function PullRequestPrimaryAction({
                 <Button
                   size="xs"
                   variant="default"
-                  disabled={actionPending || mergeBlockedReason !== null}
-                  {...inlineConfirm.props(
-                    "enable-auto-merge",
-                    () => void perform("enable-auto-merge", selectedMergeMethod),
-                  )}
+                  disabled={actionPending}
+                  aria-disabled={mergeBlockedReason !== null || undefined}
+                  aria-description={mergeBlockedReason ?? undefined}
+                  {...(mergeBlockedReason === null
+                    ? inlineConfirm.props(
+                        "enable-auto-merge",
+                        () => void perform("enable-auto-merge", selectedMergeMethod),
+                      )
+                    : {})}
                   aria-label={
                     pendingAction === "enable-auto-merge"
                       ? "Enabling..."
@@ -331,11 +335,12 @@ export function PullRequestPrimaryAction({
                 <Button
                   size="xs"
                   variant="default"
-                  disabled={actionPending || mergeBlockedReason !== null}
-                  {...inlineConfirm.props(
-                    "merge",
-                    () => void perform("merge", selectedMergeMethod),
-                  )}
+                  disabled={actionPending}
+                  aria-disabled={mergeBlockedReason !== null || undefined}
+                  aria-description={mergeBlockedReason ?? undefined}
+                  {...(mergeBlockedReason === null
+                    ? inlineConfirm.props("merge", () => void perform("merge", selectedMergeMethod))
+                    : {})}
                   aria-label={
                     pendingAction === "merge"
                       ? "Merging..."
